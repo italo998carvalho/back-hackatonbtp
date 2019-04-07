@@ -63,6 +63,7 @@ ___
 {
 	"titulo": "como trocar um pneu", 
 	"descricao": "tira o velho e põe o novo", 
+	"categoria": "ti", 
 	"arquivos": [
 		"base64ajsdhlakhsdlkahlksdhalsdhjlak", 
 		"base64qiuoweoiquwoeiquoewiqweqoui", 
@@ -107,7 +108,9 @@ ___
 ###### /conteudo/<id>/visto - POST
 ###### Confirma o consumo de um conteúdo
 ```bash
-{}
+{
+    "nota": 4.5
+}
 ```
 
 ###### /conteudosConsumidos - GET

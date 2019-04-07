@@ -7,7 +7,7 @@ from BTPIntegra.models.Avaliacao import Avaliacao
 from BTPIntegra.models.Usuario import Usuario
 from BTPIntegra.app import app, db
 from BTPIntegra.views.login import token_required
-from BTPIntegra.config import pontuacaoPorConteudoGerado, pontuacaoPorConteudoConsumido
+from BTPIntegra.config import pontuacaoPorConteudoGerado, pontuacaoPorConteudoConsumido, categoriasAceitas
 
 @token_required
 def atribuirPontos(self, idUsuario, valor):
@@ -35,8 +35,12 @@ def conteudo(usuarioAtual):
         idUsuario = usuarioAtual.id
         titulo = data['titulo']
         descricao = data['descricao']
+        categoria = data['categoria']
+
+        if categoria not in categoriasAceitas:
+            return jsonify({'code': 400, 'body':{'mensagem': 'Categoria inexistente!'}})
         
-        conteudo = Conteudo(idUsuario, titulo, descricao)
+        conteudo = Conteudo(idUsuario, titulo, descricao, categoria)
 
         try:
             db.session.add(conteudo)
@@ -147,6 +151,61 @@ def oneConteudo(usuarioAtual, id):
     conteudoAtual['numeroDeAvaliacoes'] = contadorDeAvaliacoes
 
     return jsonify({'code': 200, 'body': conteudoAtual})
+
+@content.route('/conteudo/<string:categoria>', methods=['GET'])
+@token_required
+def filtrarConteudo(usuarioAtual,categoria):
+    if request.method == 'GET':
+        try:
+            conteudos = Conteudo.query.filter_by(categoria = categoria).all()
+
+            listaConteudo = []
+            for conteudo in conteudos:
+                try:
+                    arquivos = Arquivo.query.filter_by(idConteudo = conteudo.id).all()
+                except:
+                    return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+
+                conteudoAtual = {}
+                conteudoAtual['id'] = conteudo.id
+                conteudoAtual['idUsuario'] = conteudo.idUsuario
+                conteudoAtual['titulo'] = conteudo.titulo
+                conteudoAtual['descricao'] = conteudo.descricao
+
+                listaArquivos = []
+                for arquivo in arquivos:
+                    arquivoAtual = {}
+                    arquivoAtual['midia'] = arquivo.midia
+
+                    listaArquivos.append(arquivoAtual)
+                
+                conteudoAtual['arquivos'] = listaArquivos
+
+                avaliacoes = Avaliacao.query.filter_by(idConteudo = conteudo.id).all()
+
+                somaAvaliacoes = 0
+                contadorDeAvaliacoes = 0
+
+                for avaliacao in avaliacoes:
+                    somaAvaliacoes += avaliacao.valor
+                    contadorDeAvaliacoes += 1
+                    
+                if contadorDeAvaliacoes > 0:
+                    media = somaAvaliacoes / contadorDeAvaliacoes
+                    conteudoAtual['avaliacaoMedia'] = media
+                else:
+                    conteudoAtual['avaliacaoMedia'] = None
+
+                conteudoAtual['numeroDeAvaliacoes'] = contadorDeAvaliacoes
+
+                listaConteudo.append(conteudoAtual)
+            
+            return jsonify({'code': 200, 'body': listaConteudo})
+
+        except:
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+    else:
+        return jsonify({'code': 403, 'body': {'mensagem': 'Método inválido!'}}), 403
 
 @content.route('/conteudo/<int:id>/visto', methods=['POST'])
 @token_required

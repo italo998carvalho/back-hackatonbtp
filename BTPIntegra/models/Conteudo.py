@@ -8,8 +8,10 @@ class Conteudo(db.Model):
     titulo = db.Column(db.String)
     descricao = db.Column(db.String)
     arquivos = db.relationship('Arquivo', backref='conteudo')
+    categoria = db.Column(db.String)
 
-    def __init__(self, idUsuario, titulo, descricao):
+    def __init__(self, idUsuario, titulo, descricao, categoria):
         self.idUsuario = idUsuario
         self.titulo = titulo
         self.descricao = descricao
+        self.categoria = categoria

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from BTPIntegra.models.Usuario import Usuario
 from BTPIntegra.app import db
+from BTPIntegra.config import categoriasAceitas
 
 user = Blueprint('user', __name__)
 
@@ -13,11 +14,15 @@ def usuario():
         registro = data['registro']
         senha = data['senha']
         funcao = data['funcao']
+        categoria = data['categoria']
         dataNascimento = data['dataNascimento']
         sexo = data['sexo']
         fotoPerfil = data['fotoPerfil']
 
-        usuario = Usuario(nome, registro, senha, funcao, dataNascimento, sexo, fotoPerfil)
+        if categoria not in categoriasAceitas:
+            return jsonify({'code': 400, 'body':{'mensagem': 'Categoria inexistente!'}})
+
+        usuario = Usuario(nome, registro, senha, funcao, categoria, dataNascimento, sexo, fotoPerfil)
 
         try:
             db.session.add(usuario)
@@ -38,6 +43,7 @@ def usuario():
                 usuario['nome'] = info.nome
                 usuario['registro'] = info.registro
                 usuario['funcao'] = info.funcao
+                usuario['categoria'] = info.categoria
                 usuario['dataNascimento'] = info.dataNascimento
                 usuario['sexo'] = info.sexo
                 usuario['fotoPerfil'] = info.fotoPerfil
@@ -62,6 +68,7 @@ def oneUsuario(id):
             usuario['nome'] = info.nome
             usuario['registro'] = info.registro
             usuario['funcao'] = info.funcao
+            usuario['categoria'] = info.categoria
             usuario['dataNascimento'] = info.dataNascimento
             usuario['sexo'] = info.sexo
             usuario['fotoPerfil'] = info.fotoPerfil
