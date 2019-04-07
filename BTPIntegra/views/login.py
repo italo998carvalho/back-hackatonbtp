@@ -34,12 +34,12 @@ def token_required(f):
             token = request.headers['token']
         
         if not token:
-            return jsonify({'code': 401, 'body':{'mensagem': 'Voce precisa de uma Token para ter acesso!!'}})
+            return jsonify({'code': 401, 'body':{'mensagem': 'Voce precisa de uma Token para ter acesso!!'}}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             usuarioAtual = Usuario.query.filter_by(id = data['id']).first()
         except:
-            return jsonify({'code': 401, 'body':{'mensagem': 'Token invalida!'}})
+            return jsonify({'code': 401, 'body':{'mensagem': 'Token invalida!'}}), 401
         
         return f(usuarioAtual, *args, **kwargs)
     

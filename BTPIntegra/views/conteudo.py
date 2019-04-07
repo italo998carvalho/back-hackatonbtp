@@ -1,10 +1,25 @@
 from flask import Blueprint, request, jsonify
 from BTPIntegra.models.Conteudo import Conteudo
+from BTPIntegra.models.ConteudoConsumido import ConteudoConsumido
 from BTPIntegra.models.Arquivo import Arquivo
 from BTPIntegra.models.Pontuacao import Pontuacao
 from BTPIntegra.app import app, db
 from BTPIntegra.views.login import token_required
-from BTPIntegra.config import pontuacaoPorConteudoGerado
+from BTPIntegra.config import pontuacaoPorConteudoGerado, pontuacaoPorConteudoConsumido
+
+@token_required
+def atribuirPontos(idUsuario, valor):
+    pontuacao = Pontuacao.query.filter_by(idUsuario = idUsuario).first()
+    if not pontuacao:
+        pontuacao = Pontuacao(usuarioAtual.id, valor)
+    else:
+        pontuacao.valor += valor
+        
+    try:
+        db.session.add(pontuacao)
+        db.session.commit()
+    except:
+        return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
 content = Blueprint('content', __name__)
 
@@ -29,7 +44,7 @@ def conteudo(usuarioAtual):
         dados = data['arquivos']
         for info in dados:
 
-            arquivo = Arquivo(usuarioAtual.id, info)
+            arquivo = Arquivo(conteudo.id, info)
 
             try:
                 db.session.add(arquivo)
@@ -37,17 +52,7 @@ def conteudo(usuarioAtual):
             except:
                 return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
-        pontuacao = Pontuacao.query.filter_by(idUsuario = usuarioAtual.id).first()
-        if not pontuacao:
-            pontuacao = Pontuacao(usuarioAtual.id, pontuacaoPorConteudoGerado)
-        else:
-            pontuacao.valor += pontuacaoPorConteudoGerado
-        
-        try:
-            db.session.add(pontuacao)
-            db.session.commit()
-        except:
-            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoGerado)
         
         return jsonify({'code': 200, 'body': {'mensagem': 'Conteúdo cadastrado com sucesso!'}})
     
@@ -105,3 +110,66 @@ def oneConteudo(usuarioAtual, id):
     conteudoAtual['arquivos'] = listaArquivos
 
     return jsonify({'code': 200, 'body': conteudoAtual})
+
+@content.route('/conteudo/<int:id>/visto', methods=['POST'])
+@token_required
+def visualizarConteudo(usuarioAtual, id):
+    if request.method == 'POST':
+        conteudo = Conteudo.query.filter_by(id = id).first()
+
+        if not conteudo:
+            return jsonify({'code': 200, 'body':{'mensagem': 'Conteúdo inexistente!'}})
+
+        conteudoChecado = ConteudoConsumido.query.filter_by(idConteudo = conteudo.id).first()
+        if conteudoChecado:
+            return jsonify({'code': 200, 'body':{'mensagem': 'Você já visualizou este conteúdo!'}})
+        
+        conteudoConsumido = ConteudoConsumido(usuarioAtual.id, conteudo.id)
+
+        try:
+            db.session.add(conteudoConsumido)
+            db.session.commit()
+        except:
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+
+        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoGerado)
+
+        return jsonify({'code': 200, 'body': {'mensagem': 'Sucesso!!'}})
+
+    else:
+        return jsonify({'code': 403, 'body': {'mensagem': 'Método inválido!'}}), 403
+
+@content.route('/conteudosConsumidos', methods=['GET'])
+@token_required
+def visualizarEventosConsumidos(usuarioAtual):
+    if request.method == 'GET':
+        try:
+            conteudos = ConteudoConsumido.query.filter_by(idUsuario = usuarioAtual.id).all()
+
+            conteudosConsumidos = []
+            for conteudo in conteudos:
+                conteudo = Conteudo.query.filter_by(id = conteudo.idConteudo).first()
+                
+                conteudoAtual = {}
+                conteudoAtual['id'] = conteudo.id
+                conteudoAtual['titulo'] = conteudo.titulo
+                conteudoAtual['descricao'] = conteudo.descricao
+
+                arquivos = Arquivo.query.filter_by(idConteudo = conteudo.id).all()
+                arquivosAtuais = []
+                for arquivo in arquivos:
+                    arquivoAtual = {}
+                    arquivoAtual['midia'] = arquivo.midia
+
+                    arquivosAtuais.append(arquivoAtual)
+
+                conteudoAtual['arquivos'] = arquivosAtuais
+
+                conteudosConsumidos.append(conteudoAtual)
+            
+            return jsonify({'code': 200, 'body': conteudosConsumidos})
+        except:
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+    
+    else:
+        return jsonify({'code': 403, 'body': {'mensagem': 'Método inválido!'}}), 403

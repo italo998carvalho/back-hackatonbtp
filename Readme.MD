@@ -23,7 +23,11 @@ ___
 {
 	"nome": "Nome Do Usuário", 
 	"registro": "123456", 
-	"senha": "123"
+	"senha": "123", 
+	"funcao": "operador de RTG", 
+	"dataNascimento": "2019-04-05", 
+	"sexo": "M", 
+	"fotoPerfil": "base64poklçoonoioimoifw"
 }
 ```
 
@@ -88,7 +92,7 @@ ___
 }
 ```
 
-###### /conteudo/<id>
+###### /conteudo/<id> - GET
 ###### Retorna um dicionario de um conteúdo específico
 ```bash
 {
@@ -97,5 +101,37 @@ ___
 	titulo: "Como trocar tal peça do caminhão", 
 	descricao: "É explicado como trocar tal peça do caminhão", 
 	midia: File
+}
+```
+
+###### /conteudo/<id>/visto - POST
+###### Confirma o consumo de um conteúdo
+```bash
+{}
+```
+
+###### /conteudosConsumidos - GET
+###### Retorna um dicionario com os conteúdos já consumidos pelo usuário
+```bash
+{
+    "body": [
+        {
+            "arquivos": [
+                {
+                    "midia": "base64ajsdhlakhsdlkahlksdhalsdhjlak"
+                },
+                {
+                    "midia": "base64qiuoweoiquwoeiquoewiqweqoui"
+                },
+                {
+                    "midia": "base64znxbcnvmnvmnzxmczmbxcbnzvxcbn"
+                }
+            ],
+            "descricao": "tira o velho e põe o novo",
+            "id": 1,
+            "titulo": "como trocar um pneu"
+        }
+    ],
+    "code": 200
 }
 ```
