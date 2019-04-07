@@ -19,9 +19,9 @@ def usuario():
             db.session.add(usuario)
             db.session.commit()
             
-            return jsonify({'code': 200, 'data': {'mensagem': 'Usuário cadastrado com sucesso!'}})
+            return jsonify({'code': 200, 'body': {'mensagem': 'Usuário cadastrado com sucesso!'}})
         except:
-            return jsonify({'code': 500, 'data': {'mensagem': 'Erro interno!'}})
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
         
     elif request.method == 'GET':
         try:
@@ -36,12 +36,12 @@ def usuario():
 
                 usuarios.append(usuario)
 
-            return jsonify({'code': 200, 'data': usuarios})
+            return jsonify({'code': 200, 'body': usuarios})
         except:
-            return jsonify({'code': 500, 'data': {'mensagem': 'Erro interno!'}})
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
     else:
-        return jsonify({'code': 403, 'data': {'mensagem': 'Método inválido!'}})
+        return jsonify({'code': 403, 'body': {'mensagem': 'Método inválido!'}}), 403
 
 @user.route('/usuario/<int:id>', methods=['GET'])
 def oneUsuario(id):
@@ -54,9 +54,9 @@ def oneUsuario(id):
             usuario['nome'] = info.nome
             usuario['registro'] = info.registro
 
-            return jsonify({'code': 200, 'data': usuario})
+            return jsonify({'code': 200, 'body': usuario})
         except:
-            return jsonify({'code': 500, 'data': {'mensagem': 'Erro interno!'}})
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
     
     else:
-        return jsonify({'code': 500, 'data': {'mensagem': 'Método inválido!'}})
+        return jsonify({'code': 500, 'body': {'mensagem': 'Método inválido!'}}), 500

@@ -18,3 +18,6 @@ app.register_blueprint(auth)
 
 from BTPIntegra.views.usuarios import user
 app.register_blueprint(user)
+
+from BTPIntegra.views.conteudo import content
+app.register_blueprint(content)
