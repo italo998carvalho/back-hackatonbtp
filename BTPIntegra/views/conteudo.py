@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from BTPIntegra.models.Conteudo import Conteudo
 from BTPIntegra.models.ConteudoConsumido import ConteudoConsumido
 from BTPIntegra.models.Arquivo import Arquivo
-from BTPIntegra.models.Pontuacao import Pontuacao
 from BTPIntegra.models.Avaliacao import Avaliacao
 from BTPIntegra.models.Usuario import Usuario
 from BTPIntegra.app import app, db
@@ -10,16 +9,11 @@ from BTPIntegra.views.login import token_required
 from BTPIntegra.config import pontuacaoPorConteudoGerado, pontuacaoPorConteudoConsumido, categoriasAceitas
 
 @token_required
-def atribuirPontos(self, idUsuario, valor):
-    pontuacao = Pontuacao.query.filter_by(idUsuario = idUsuario).first()
-    if not pontuacao:
-        usuarioAtual =  Usuario.query.filter_by(id = idUsuario).first()
-        pontuacao = Pontuacao(usuarioAtual.id, valor)
-    else:
-        pontuacao.valor += valor
+def atribuirPontos(self, valor):
+    self.pontuacao += valor
         
     try:
-        db.session.add(pontuacao)
+        db.session.add(self)
         db.session.commit()
     except:
         return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
@@ -59,7 +53,7 @@ def conteudo(usuarioAtual):
             except:
                 return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
-        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoGerado)
+        atribuirPontos(pontuacaoPorConteudoGerado)
         
         return jsonify({'code': 200, 'body': {'mensagem': 'Conteúdo cadastrado com sucesso!'}})
     
@@ -228,7 +222,7 @@ def visualizarConteudo(usuarioAtual, id):
         except:
             return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
-        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoConsumido)
+        atribuirPontos(pontuacaoPorConteudoConsumido)
 
         data = request.get_json()
         nota = data['nota']

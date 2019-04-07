@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from BTPIntegra.models.Usuario import Usuario
+from BTPIntegra.views.login import token_required
 from BTPIntegra.app import db
 from BTPIntegra.config import categoriasAceitas
 
@@ -58,7 +59,8 @@ def usuario():
         return jsonify({'code': 403, 'body': {'mensagem': 'Método inválido!'}}), 403
 
 @user.route('/usuario/<int:id>', methods=['GET'])
-def oneUsuario(id):
+@token_required
+def oneUsuario(usuarioAtual, id):
     if request.method == 'GET':
         try:
             info = Usuario.query.filter_by(id = id).first()

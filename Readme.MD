@@ -11,7 +11,7 @@ ___
 ###### Login do usuário 
 ```bash
 {
-	"usuario": "usuario", 
+	"registro": "123456", 
 	"senha": "123"
 }
 ```
@@ -24,7 +24,8 @@ ___
 	"nome": "Nome Do Usuário", 
 	"registro": "123456", 
 	"senha": "123", 
-	"funcao": "operador de RTG", 
+	"funcao": "Desenvolvedor", 
+	"categoria": "ti", 
 	"dataNascimento": "2019-04-05", 
 	"sexo": "M", 
 	"fotoPerfil": "base64poklçoonoioimoifw"
@@ -37,9 +38,14 @@ ___
 {
     "body": [
         {
+            "categoria": "ti",
+            "dataNascimento": "Thu, 17 Dec 1998 00:00:00 GMT",
+            "fotoPerfil": "base64poklçoonoioimoifw",
+            "funcao": "Desenvolvedor",
             "id": 1,
             "nome": "Italo",
-            "registro": 123456
+            "registro": 123456,
+            "sexo": "M"
         }
     ],
     "code": 200
@@ -50,8 +56,17 @@ ___
 ###### Retorna um usuário
 ```bash
 {
-	"nome": "Nome Do Usuário", 
-	"email": "usuario@email.com", 
+    "body": {
+        "categoria": "ti",
+        "dataNascimento": "Thu, 17 Dec 1998 00:00:00 GMT",
+        "fotoPerfil": "base64poklçoonoioimoifw",
+        "funcao": "Desenvolvedor",
+        "id": 1,
+        "nome": "Italo",
+        "registro": 123456,
+        "sexo": "M"
+    },
+    "code": 200
 }
 ```
 
@@ -61,14 +76,13 @@ ___
 ###### Cadastra um conteúdo
 ```bash
 {
-	"titulo": "como trocar um pneu", 
-	"descricao": "tira o velho e põe o novo", 
-	"categoria": "ti", 
-	"arquivos": [
-		"base64ajsdhlakhsdlkahlksdhalsdhjlak", 
-		"base64qiuoweoiquwoeiquoewiqweqoui", 
-		"base64znxbcnvmnvmnzxmczmbxcbnzvxcbn"
-	]
+    "titulo": "Como proceder em caso de queda de sistema", 
+    "descricao": "Em caso de queda de energia, ...", 
+    "categoria": "ti", 
+    "arquivos": [
+        "base64ajsdhlakhsdlkahlksdhalsdhjlak", 
+        "base64qiuoweoiquwoeiquoewiqweqoui"
+    ]
 }
 ```
 
@@ -76,20 +90,38 @@ ___
 ###### Retorna um dicionario com todos os conteúdos
 ```bash
 {
-	{
-		id: 1, 
-		tipo: "Artigo", 
-		titulo: "Como trocar tal peça do caminhão", 
-		descricao: "É explicado como trocar tal peça do caminhão", 
-		midia: File
-	}, 
-	{
-		id: 2, 
-		tipo: "Artigo", 
-		titulo: "Como prender o container", 
-		descricao: "É explicado como trocar prender o container", 
-		midia: File
-	}
+    "body": [
+        {
+            "arquivos": [
+                {
+                    "midia": "base64ajsdhlakhsdlkahlksdhalsdhjlak"
+                }
+            ],
+            "avaliacaoMedia": 5,
+            "descricao": "tira o velho e põe o novo",
+            "id": 5,
+            "idUsuario": 2,
+            "numeroDeAvaliacoes": 1,
+            "titulo": "como trocar um step"
+        },
+        {
+            "arquivos": [
+                {
+                    "midia": "base64ajsdhlakhsdlkahlksdhalsdhjlak"
+                },
+                {
+                    "midia": "base64qiuoweoiquwoeiquoewiqweqoui"
+                }
+            ],
+            "avaliacaoMedia": null,
+            "descricao": "Em caso de queda de energia, ...",
+            "id": 6,
+            "idUsuario": 1,
+            "numeroDeAvaliacoes": 0,
+            "titulo": "Como proceder em caso de queda de sistema"
+        }
+    ],
+    "code": 200
 }
 ```
 
@@ -97,11 +129,19 @@ ___
 ###### Retorna um dicionario de um conteúdo específico
 ```bash
 {
-	id: 1, 
-	tipo: "Artigo", 
-	titulo: "Como trocar tal peça do caminhão", 
-	descricao: "É explicado como trocar tal peça do caminhão", 
-	midia: File
+    "body": {
+        "arquivos": [
+            {
+                "midia": "base64ajsdhlakhsdlkahlksdhalsdhjlak"
+            }
+        ],
+        "avaliacaoMedia": 5,
+        "descricao": "tira o velho e põe o novo",
+        "idUsuario": 2,
+        "numeroDeAvaliacoes": 1,
+        "titulo": "como trocar um step"
+    },
+    "code": 200
 }
 ```
 
@@ -122,17 +162,11 @@ ___
             "arquivos": [
                 {
                     "midia": "base64ajsdhlakhsdlkahlksdhalsdhjlak"
-                },
-                {
-                    "midia": "base64qiuoweoiquwoeiquoewiqweqoui"
-                },
-                {
-                    "midia": "base64znxbcnvmnvmnzxmczmbxcbnzvxcbn"
                 }
             ],
             "descricao": "tira o velho e põe o novo",
-            "id": 1,
-            "titulo": "como trocar um pneu"
+            "id": 5,
+            "titulo": "como trocar um step"
         }
     ],
     "code": 200

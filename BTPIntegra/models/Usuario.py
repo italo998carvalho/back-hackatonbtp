@@ -9,10 +9,11 @@ class Usuario(db.Model):
     registro = db.Column(db.Integer)
     senha = db.Column(db.String(255))
     funcao = db.Column(db.String(100))
-    categoria = db.Column(db.String)
+    categoria = db.Column(db.String(40))
     dataNascimento = db.Column(db.DateTime)
     sexo = db.Column(db.String(1))
-    fotoPerfil = db.Column(db.String)
+    fotoPerfil = db.Column(db.String) #base64
+    pontuacao = db.Column(db.Integer)
 
     def __init__(self, nome, registro, senha, funcao, categoria, dataNascimento, sexo, fotoPerfil):
         self.nome = nome
@@ -23,3 +24,4 @@ class Usuario(db.Model):
         self.dataNascimento = dataNascimento
         self.sexo = sexo
         self.fotoPerfil = fotoPerfil
+        self.pontuacao = 0
