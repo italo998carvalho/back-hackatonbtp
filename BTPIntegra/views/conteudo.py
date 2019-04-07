@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from BTPIntegra.models.Conteudo import Conteudo
 from BTPIntegra.models.Arquivo import Arquivo
+from BTPIntegra.models.Pontuacao import Pontuacao
 from BTPIntegra.app import app, db
 from BTPIntegra.views.login import token_required
+from BTPIntegra.config import pontuacaoPorConteudoGerado
 
 content = Blueprint('content', __name__)
 
@@ -34,6 +36,18 @@ def conteudo(usuarioAtual):
                 db.session.commit()
             except:
                 return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
+
+        pontuacao = Pontuacao.query.filter_by(idUsuario = usuarioAtual.id).first()
+        if not pontuacao:
+            pontuacao = Pontuacao(usuarioAtual.id, pontuacaoPorConteudoGerado)
+        else:
+            pontuacao.valor += pontuacaoPorConteudoGerado
+        
+        try:
+            db.session.add(pontuacao)
+            db.session.commit()
+        except:
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
         
         return jsonify({'code': 200, 'body': {'mensagem': 'Conteúdo cadastrado com sucesso!'}})
     

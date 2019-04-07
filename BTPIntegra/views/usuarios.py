@@ -12,8 +12,12 @@ def usuario():
         nome = data['nome']
         registro = data['registro']
         senha = data['senha']
+        funcao = data['funcao']
+        dataNascimento = data['dataNascimento']
+        sexo = data['sexo']
+        fotoPerfil = data['fotoPerfil']
 
-        usuario = Usuario(nome, registro, senha)
+        usuario = Usuario(nome, registro, senha, funcao, dataNascimento, sexo, fotoPerfil)
 
         try:
             db.session.add(usuario)
@@ -33,6 +37,10 @@ def usuario():
                 usuario['id'] = info.id
                 usuario['nome'] = info.nome
                 usuario['registro'] = info.registro
+                usuario['funcao'] = info.funcao
+                usuario['dataNascimento'] = info.dataNascimento
+                usuario['sexo'] = info.sexo
+                usuario['fotoPerfil'] = info.fotoPerfil
 
                 usuarios.append(usuario)
 
@@ -53,6 +61,10 @@ def oneUsuario(id):
             usuario['id'] = info.id
             usuario['nome'] = info.nome
             usuario['registro'] = info.registro
+            usuario['funcao'] = info.funcao
+            usuario['dataNascimento'] = info.dataNascimento
+            usuario['sexo'] = info.sexo
+            usuario['fotoPerfil'] = info.fotoPerfil
 
             return jsonify({'code': 200, 'body': usuario})
         except:
