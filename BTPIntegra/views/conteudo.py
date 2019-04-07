@@ -3,14 +3,17 @@ from BTPIntegra.models.Conteudo import Conteudo
 from BTPIntegra.models.ConteudoConsumido import ConteudoConsumido
 from BTPIntegra.models.Arquivo import Arquivo
 from BTPIntegra.models.Pontuacao import Pontuacao
+from BTPIntegra.models.Avaliacao import Avaliacao
+from BTPIntegra.models.Usuario import Usuario
 from BTPIntegra.app import app, db
 from BTPIntegra.views.login import token_required
 from BTPIntegra.config import pontuacaoPorConteudoGerado, pontuacaoPorConteudoConsumido
 
 @token_required
-def atribuirPontos(idUsuario, valor):
+def atribuirPontos(self, idUsuario, valor):
     pontuacao = Pontuacao.query.filter_by(idUsuario = idUsuario).first()
     if not pontuacao:
+        usuarioAtual =  Usuario.query.filter_by(id = idUsuario).first()
         pontuacao = Pontuacao(usuarioAtual.id, valor)
     else:
         pontuacao.valor += valor
@@ -81,6 +84,23 @@ def conteudo(usuarioAtual):
             
             conteudoAtual['arquivos'] = listaArquivos
 
+            avaliacoes = Avaliacao.query.filter_by(idConteudo = conteudo.id).all()
+
+            somaAvaliacoes = 0
+            contadorDeAvaliacoes = 0
+
+            for avaliacao in avaliacoes:
+                somaAvaliacoes += avaliacao.valor
+                contadorDeAvaliacoes += 1
+                
+            if contadorDeAvaliacoes > 0:
+                media = somaAvaliacoes / contadorDeAvaliacoes
+                conteudoAtual['avaliacaoMedia'] = media
+            else:
+                conteudoAtual['avaliacaoMedia'] = None
+
+            conteudoAtual['numeroDeAvaliacoes'] = contadorDeAvaliacoes
+
             listaConteudo.append(conteudoAtual)
         
         return jsonify({'code': 200, 'body': listaConteudo})
@@ -109,6 +129,23 @@ def oneConteudo(usuarioAtual, id):
             
     conteudoAtual['arquivos'] = listaArquivos
 
+    avaliacoes = Avaliacao.query.filter_by(idConteudo = conteudo.id).all()
+
+    somaAvaliacoes = 0
+    contadorDeAvaliacoes = 0
+
+    for avaliacao in avaliacoes:
+        somaAvaliacoes += avaliacao.valor
+        contadorDeAvaliacoes += 1
+                
+    if contadorDeAvaliacoes > 0:
+        media = somaAvaliacoes / contadorDeAvaliacoes
+        conteudoAtual['avaliacaoMedia'] = media
+    else:
+        conteudoAtual['avaliacaoMedia'] = None
+
+    conteudoAtual['numeroDeAvaliacoes'] = contadorDeAvaliacoes
+
     return jsonify({'code': 200, 'body': conteudoAtual})
 
 @content.route('/conteudo/<int:id>/visto', methods=['POST'])
@@ -120,7 +157,7 @@ def visualizarConteudo(usuarioAtual, id):
         if not conteudo:
             return jsonify({'code': 200, 'body':{'mensagem': 'Conteúdo inexistente!'}})
 
-        conteudoChecado = ConteudoConsumido.query.filter_by(idConteudo = conteudo.id).first()
+        conteudoChecado = ConteudoConsumido.query.filter_by(idUsuario = usuarioAtual.id, idConteudo = conteudo.id).first()
         if conteudoChecado:
             return jsonify({'code': 200, 'body':{'mensagem': 'Você já visualizou este conteúdo!'}})
         
@@ -132,7 +169,16 @@ def visualizarConteudo(usuarioAtual, id):
         except:
             return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
-        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoGerado)
+        atribuirPontos(usuarioAtual.id, pontuacaoPorConteudoConsumido)
+
+        data = request.get_json()
+        nota = data['nota']
+        avaliacao = Avaliacao(usuarioAtual.id, conteudo.id, nota)
+        try:
+            db.session.add(avaliacao)
+            db.session.commit()
+        except:
+            return jsonify({'code': 500, 'body': {'mensagem': 'Erro interno!'}}), 500
 
         return jsonify({'code': 200, 'body': {'mensagem': 'Sucesso!!'}})
 
