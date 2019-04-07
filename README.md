@@ -1,6 +1,19 @@
 # HACKATON BTP
 
-## API da equipe On Target
+## API da equipe OnTarget
+Solução da equipe OnTarget desenvolvido em Python utilizando o microframework Flask
+___
+## Configuração
+#### Dependências
+É necessário ter instalado o interpretador da linguagem [Python](https://www.python.org/downloads/) e um banco de dados relacional (preferencialmente PostgreSQL). Caso sua máquina seja um MacOS ou alguma distro de Linux, provavelmente já terá o Python instalado.
+
+#### Execução
+1. Clone este repositorio e acesse a pasta raíz via terminal
+2. Crie um ambiente virtual para isolar as dependências (comando Linux: python3 -m venv venv)
+3. Execute o ambiente virtual (comando Linux: source venv/bin/activate)
+4. Instale as dependências (Comando Linux: pip install -r requirements.txt)
+5. Altere a string de conexão do banco em /BTPIntegra/app.py, [neste link](http://flask-sqlalchemy.pocoo.org/2.3/config/) é possível encontrar um exemplo de string de conexão da ORM utilizada neste trabalho (que foi a SQLAlchemy) para diversos bancos relacionais.
+6. Execute a aplicação (comando Linux: python3 run.py)
 
 ___
 ## Rotas
